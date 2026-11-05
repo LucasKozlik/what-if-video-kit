@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What If There Were No Bugs?</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="grain"></canvas>
+  <div id="hud">
+    <div id="shade"></div>
+    <div id="hook">
+      <span class="l1">WHAT IF THERE WERE</span>
+      <span class="l2">NO BUGS</span>
+      <span class="l3">ON THE PLANET?</span>
+    </div>
+    <div id="counters">
+      <div class="eyebrow" id="cDayLbl">DAYS WITHOUT INSECTS</div>
+      <div class="big" id="cDay">0</div>
+      <div class="row" id="insBox"><label>INSECTS ALIVE</label><b id="cIns">10 quintillion</b></div>
+      <div class="row"><label>SONGBIRDS LEFT</label><b id="cBirds">100%</b></div>
+      <div class="row"><label>WILDFLOWERS</label><b id="cFlw">100%</b></div>
+    </div>
+    <div id="caption"></div>
+    <div id="endcard">
+      <div class="tag">REAL FACT</div>
+      <p>In <b>2017</b>, scientists found that nature reserves in <b>Germany</b> had lost</p>
+      <p><span class="big">76%</span></p>
+      <p>of their flying insects, by weight, in just <b>27 years.</b></p>
+      <p class="small">Hallmann et al., PLOS ONE, 2017</p>
+      <div class="cta">What would <b>YOU</b> miss first? 👇</div>
+    </div>
+  </div>
+  <div id="start">
+    <button id="playBtn">▶&nbsp; Play</button>
+    <p>Space pause · R restart · ← → seek 5s · H hide UI</p>
+  </div>
+  <div id="timebar"><i></i></div>
+  <div id="err"></div>
+</div>
+<script>
+window.onerror = (m, s, l, c) => {
+  const e = document.getElementById('err');
+  e.style.display = 'block';
+  e.textContent += `${m} @ ${(s || '').split('/').pop()}:${l}:${c}\n`;
+};
+</script>
+<script src="lib/three.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/field.js"></script>
+<script src="js/world.js"></script>
+<script src="js/life.js"></script>
+<script src="js/director.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
