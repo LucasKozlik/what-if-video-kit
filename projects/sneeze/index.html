@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What If Everyone Sneezed At Once?</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="grain"></canvas>
+  <div id="hud">
+    <div id="lidT" class="lid"></div><div id="lidB" class="lid"></div>
+    <div id="shade"></div>
+    <div id="hook">
+      <span class="l1">WHAT IF</span>
+      <span class="l2">EVERYONE SNEEZED</span>
+      <span class="l3">AT THE SAME TIME?</span>
+    </div>
+    <div id="loop">One of these myths is true.<br><b>Guess which before the end.</b></div>
+    <div id="counters">
+      <div class="eyebrow">PEOPLE SNEEZING</div>
+      <div class="big" id="cPpl">0</div>
+      <div class="row"><label>CLOCK</label><b id="cClock">11:59:57.0</b></div>
+      <div class="row"><label>DROPLETS IN AIR (UP TO)</label><b id="cDrops">0</b></div>
+      <div class="row"><label>SNEEZE SPEED</label><b id="cMph">0.0 mph</b></div>
+      <div class="row"><label>DRIVEN BLIND</label><b id="cBlind">0.0 m</b></div>
+    </div>
+    <div id="meter"><div id="mLabel"></div><div id="mVal"></div><div id="mSub"></div></div>
+    <div id="stamp">MYTH ✗</div>
+    <svg id="xray" viewBox="0 0 300 360">
+      <defs><radialGradient id="glow"><stop offset="0" stop-color="#ff4d3a" stop-opacity=".9"/><stop offset="1" stop-color="#ff4d3a" stop-opacity="0"/></radialGradient></defs>
+      <rect x="0" y="0" width="300" height="360" rx="18" fill="rgba(6,18,30,.82)" stroke="#6fd3ff" stroke-width="2"/>
+      <path d="M95 40 C150 20 225 40 232 105 C238 150 228 170 238 185 L250 205 L236 212 L240 236 C242 252 225 258 212 256 L205 270 C200 290 185 300 160 300 L150 345" fill="none" stroke="#6fd3ff" stroke-width="3"/>
+      <path d="M95 40 C60 60 52 120 70 170 C80 200 100 230 110 345" fill="none" stroke="#6fd3ff" stroke-width="3"/>
+      <path d="M200 205 C185 205 170 215 165 235 L160 345" fill="none" stroke="#9fe6ff" stroke-width="2" stroke-dasharray="5 4"/>
+      <path d="M128 230 L130 345" fill="none" stroke="#9fe6ff" stroke-width="2" stroke-dasharray="5 4"/>
+      <circle cx="150" cy="250" r="calc(30px)" fill="url(#glow)" style="transform-origin:150px 250px; transform: scale(calc(.8 + var(--p) * .6))"/>
+      <g fill="#ff4d3a"><path d="M150 205 l-8 14 h16 z"/><path d="M150 300 l-8 -14 h16 z"/><path d="M110 252 l14 -8 v16 z"/><path d="M190 252 l-14 -8 v16 z"/></g>
+      <path d="M238 192 l18 -6" stroke="#ffd84a" stroke-width="4" stroke-linecap="round"/>
+      <path d="M232 238 l20 2" stroke="#ffd84a" stroke-width="4" stroke-linecap="round"/>
+      <text x="150" y="30" text-anchor="middle" fill="#9fe6ff" font-family="Inter" font-weight="800" font-size="15" letter-spacing="3">PRESSURE · NO EXIT</text>
+      <text x="262" y="190" fill="#ffd84a" font-family="Inter" font-weight="800" font-size="13">nose</text>
+      <text x="258" y="246" fill="#ffd84a" font-family="Inter" font-weight="800" font-size="13">mouth</text>
+    </svg>
+    <div id="myths">
+      <div class="m"><span class="x">✗</span> Sneezes go 100 mph</div>
+      <div class="m"><span class="x">✗</span> Your heart stops</div>
+      <div class="m"><span class="x">✗</span> Your eyes can pop out</div>
+      <div class="m t" id="mTrue"><span>✓</span> Holding it in can hurt you</div>
+    </div>
+    <div id="caption"></div>
+    <div id="endcard">
+      <div class="tag">REAL FACT</div>
+      <p>In <b>2018</b>, a 34-year-old man in <b>Leicester, UK</b> tore the back of his throat</p>
+      <p><span class="big">holding in a sneeze.</span></p>
+      <p class="small">BMJ Case Reports, 2018 · He pinched his nose and kept his mouth shut.</p>
+      <p class="small2">Record: Donna Griffiths sneezed for <b>976 days</b> straight (Guinness World Records)</p>
+      <div class="cta">Bless you 🤧 Which myth did <b>YOU</b> believe? 👇</div>
+    </div>
+  </div>
+  <div id="start"><button id="playBtn">▶&nbsp; Play</button><p>Space pause · R restart · ← → seek 5s · H hide UI</p></div>
+  <div id="timebar"><i></i></div>
+  <div id="err"></div>
+</div>
+<script>
+window.onerror = (m, s, l, c) => { const e = document.getElementById('err'); e.style.display = 'block'; e.textContent += `${m} @ ${(s || '').split('/').pop()}:${l}:${c}\n`; };
+</script>
+<script src="lib/three.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/field.js"></script>
+<script src="js/world.js"></script>
+<script src="js/people.js"></script>
+<script src="js/droplets.js"></script>
+<script src="js/director.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
