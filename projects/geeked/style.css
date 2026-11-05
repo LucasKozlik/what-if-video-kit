@@ -1,0 +1,64 @@
+/* 9:16 stage, type in cqw so the HUD is identical at preview size and at 1080x1920. */
+html, body { margin: 0; height: 100%; background: #050506; overflow: hidden; font-family: Inter, system-ui, sans-serif; }
+#stage { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  aspect-ratio: 9 / 16; height: 100%; max-width: 100%; container-type: size; overflow: hidden; background: #000; }
+@media (max-aspect-ratio: 9/16) { #stage { width: 100%; height: auto; } }
+#gl, #grain, #hud { position: absolute; inset: 0; width: 100%; height: 100%; }
+#grain { opacity: 0.03; mix-blend-mode: overlay; pointer-events: none; }
+#hud { pointer-events: none; color: #fff; }
+.hidehud #hud, .hidehud #timebar { display: none; }
+#shade { position: absolute; left: 0; right: 0; top: 0; height: 32%; opacity: 0;
+  background: linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.18) 60%, rgba(0,0,0,0)); }
+
+/* Meme-weight type: heavy sans, black stroke, so it reads over anything. */
+.stroke { -webkit-text-stroke: 0.55cqw #000; paint-order: stroke fill; }
+#hook { position: absolute; top: 24%; left: 3%; right: 3%; text-align: center; opacity: 0; }
+#hook span { display: block; line-height: 0.98; font-weight: 900; -webkit-text-stroke: 0.7cqw #000; paint-order: stroke fill;
+  text-shadow: 0 0.8cqw 3cqw rgba(0,0,0,.6); }
+#hook .l1 { font-size: 10cqw; letter-spacing: .02em; }
+#hook .l2 { font-size: 20cqw; color: #c6ff3a; letter-spacing: -0.02em; margin-top: 1cqw; transform: rotate(-4deg); }
+#loop { position: absolute; top: 60%; left: 10%; right: 18%; text-align: center; opacity: 0; font-weight: 800;
+  font-size: 5.6cqw; line-height: 1.2; -webkit-text-stroke: 0.45cqw #000; paint-order: stroke fill; }
+#loop b { color: #ffd84a; }
+
+#counters { position: absolute; top: 8.5%; left: 7%; right: 30%; opacity: 0; }
+#counters .eyebrow { font-weight: 800; font-size: 3cqw; letter-spacing: .22em; color: rgba(255,255,255,.9); }
+#counters .big { font-family: Cambria, Caladea, 'Liberation Serif', serif; font-weight: 700; font-size: 16cqw; line-height: 1;
+  margin: .6cqw 0 2cqw; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; color: #c6ff3a;
+  text-shadow: 0 .5cqw 2cqw rgba(0,0,0,.6); }
+#counters .row { display: grid; grid-template-columns: 33cqw auto; align-items: baseline; margin: .8cqw 0; white-space: nowrap;
+  text-shadow: 0 .3cqw 1.2cqw rgba(0,0,0,.85); }
+#counters .row label { font-weight: 700; font-size: 2.6cqw; letter-spacing: .18em; color: #e4e4e4; }
+#counters .row b { font-weight: 900; font-size: 4cqw; font-variant-numeric: tabular-nums lining-nums; }
+
+#caption { position: absolute; top: 62%; left: 6%; right: 17%; text-align: center; }
+#caption .cap { font-weight: 900; font-size: 7cqw; line-height: 1.12; color: #fff;
+  -webkit-text-stroke: 0.6cqw #000; paint-order: stroke fill; text-shadow: 0 .6cqw 2cqw rgba(0,0,0,.6); }
+#caption .cap.wait { font-size: 22cqw; }
+#caption span { display: inline-block; opacity: 0; }
+#caption span.em { color: #c6ff3a; }
+#caption .wait span.em { color: #ff4d3a; }
+
+#endcard { position: absolute; inset: 0; padding: 0 15% 0 9%; display: flex; flex-direction: column; justify-content: center;
+  text-align: center; opacity: 0; visibility: hidden;
+  background: linear-gradient(rgba(0,0,0,.3), rgba(10,10,12,.85) 28%, rgba(10,10,12,.85) 74%, rgba(0,0,0,.35)); }
+#endcard .tag { align-self: center; background: #ffd84a; color: #111; font-weight: 900; font-size: 3.6cqw; letter-spacing: .2em;
+  padding: 1.2cqw 4cqw; border-radius: 1.2cqw; margin-bottom: 5cqw; }
+#endcard p { font-family: Cambria, Caladea, 'Liberation Serif', serif; font-size: 5.6cqw; line-height: 1.3; margin: 0 0 2cqw; color: #f3ede3; }
+#endcard p b { color: #ffd84a; }
+#endcard p .big { font-weight: 700; font-size: 20cqw; line-height: 1; color: #ff5a3c; font-variant-numeric: lining-nums; }
+#endcard p.small { font-family: Inter, sans-serif; font-size: 2.9cqw; letter-spacing: .12em; color: #a8a8a8; margin-top: 2cqw; }
+#endcard .cta { margin-top: 6cqw; font-weight: 900; font-size: 6cqw; }
+#endcard .cta b { color: #c6ff3a; }
+#endcard .cta2 { margin-top: 2cqw; font-weight: 700; font-size: 3.8cqw; color: #d8d8d8; }
+
+#start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.45); z-index: 5; }
+#start.gone { display: none; }
+#start button { font: inherit; font-weight: 900; font-size: 5.5cqw; padding: 3cqw 7cqw; border: 0; border-radius: 10cqw;
+  background: #c6ff3a; color: #111; cursor: pointer; }
+#start p { color: #ddd; font-size: 2.8cqw; margin-top: 3cqw; }
+#timebar { position: absolute; left: 0; right: 0; bottom: 0; height: 0.6cqw; background: rgba(255,255,255,.12); z-index: 4; }
+#timebar i { display: block; height: 100%; width: 0; background: #c6ff3a; }
+#err { display: none; position: absolute; left: 0; right: 0; top: 0; z-index: 9; background: rgba(160,0,0,.9); color: #fff;
+  font: 12px monospace; white-space: pre-wrap; padding: 8px; }

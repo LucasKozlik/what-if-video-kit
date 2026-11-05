@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What If Everyone Was Geeked?</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="grain"></canvas>
+  <div id="hud">
+    <div id="shade"></div>
+    <div id="hook">
+      <span class="l1">WHAT IF</span>
+      <span class="l1">EVERYONE WAS</span>
+      <span class="l2">GEEKED?</span>
+    </div>
+    <div id="loop">1 creature on Earth isn't.<br><b>Can you find it?</b></div>
+    <div id="counters">
+      <div class="eyebrow">PEOPLE GEEKED</div>
+      <div class="big" id="cPpl">0</div>
+      <div class="row" id="pplBox"><label>SNACKS LEFT</label><b id="cSnk">100%</b></div>
+      <div class="row"><label>CAR CRASHES</label><b id="cCrash">0</b></div>
+      <div class="row"><label>DANCE CIRCLE</label><b id="cCirc">0</b></div>
+    </div>
+    <div id="caption"></div>
+    <div id="endcard">
+      <div class="tag">REAL FACT</div>
+      <p>In <b>2022</b>, drunk-driving crashes killed</p>
+      <p><span class="big">13,524</span></p>
+      <p>people in the U.S. &mdash; about <b>one every 39 minutes.</b></p>
+      <p class="small">NHTSA, 2024 &middot; Don't drive geeked.</p>
+      <div class="cta">What would <b>YOU</b> do first? 👇</div>
+      <div class="cta2">Tag the friend who starts the dance circle.</div>
+    </div>
+  </div>
+  <div id="start">
+    <button id="playBtn">▶&nbsp; Play</button>
+    <p>Space pause · R restart · ← → seek 5s · H hide UI</p>
+  </div>
+  <div id="timebar"><i></i></div>
+  <div id="err"></div>
+</div>
+<script>
+window.onerror = (m, s, l, c) => {
+  const e = document.getElementById('err');
+  e.style.display = 'block';
+  e.textContent += `${m} @ ${(s || '').split('/').pop()}:${l}:${c}\n`;
+};
+</script>
+<script src="lib/three.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/field.js"></script>
+<script src="js/world.js"></script>
+<script src="js/people.js"></script>
+<script src="js/director.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
