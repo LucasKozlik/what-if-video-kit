@@ -33,7 +33,12 @@ const CHROME = [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-].find(p => fs.existsSync(p));
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  '/usr/bin/google-chrome',
+  '/usr/bin/chromium',
+  '/usr/bin/chromium-browser',
+].find(p => fs.existsSync(p)) || process.env.CHROME_PATH;
+if (!CHROME) { console.error('No Chrome/Edge found. Set CHROME_PATH.'); process.exit(1); }
 // Look beside the project first, then fall back to PATH.
 // Override with --ffmpeg=<path to ffmpeg.exe> or the FFMPEG env var.
 const FFMPEG = flag('ffmpeg', process.env.FFMPEG) || [
@@ -60,14 +65,15 @@ async function launch(gpu) {
   });
 }
 
-let browser = await launch(true);
-let gpu = true;
+// --gpu=0 forces SwiftShader (machines with no usable GPU, e.g. cloud containers).
+let gpu = flag('gpu', '1') !== '0';
+let browser = await launch(gpu);
 let page = await browser.newPage();
 await page.setViewport({ width: W, height: H, deviceScaleFactor: 1 });
 const errs = [];
 page.on('pageerror', e => errs.push(e.message));
 
-const url = pathToFileURL(path.join(root, 'index.html')).href + `?render=1&fps=${FPS}&clean`;
+const url = pathToFileURL(path.join(root, 'index.html')).href + `?render=1&fps=${FPS}&clean` + (flag('q', '') ? '&' + flag('q', '') : '');
 await page.goto(url, { timeout: 300000 });
 await page.waitForFunction(() => document.title === 'RENDER_READY', { timeout: 300000, polling: 200 })
   .catch(() => { throw new Error('page never reached RENDER_READY\n' + errs.join('\n')); });

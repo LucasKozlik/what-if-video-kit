@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What If You Could See How Much Money Everyone Has?</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="grain"></canvas>
+  <div id="vignette"></div>
+  <div id="hud">
+    <div id="labels"></div>
+    <div id="counters">
+      <div class="ctr"><label>PEOPLE</label><b id="cPeople">0</b></div>
+      <div class="ctr" id="boxMed"><label>MEDIAN</label><b id="cMed">&mdash;</b></div>
+      <div class="ctr" id="boxAvg"><label>AVERAGE</label><b id="cAvg">&mdash;</b></div>
+    </div>
+    <div id="hook">
+      <span class="l1">What if you could see</span>
+      <span class="l2">how much money</span>
+      <span class="l3">everyone has?</span>
+    </div>
+    <div id="caption"></div>
+    <div id="endcard">
+      <div class="tag">REAL NUMBERS</div>
+      <p>In 2022, the <b>median</b> U.S. family had a net worth of</p>
+      <p class="big">$192,900</p>
+      <p>The <b class="gold">average</b> was <span class="gold">$1,063,700</span>, pulled up by the families at the very top.</p>
+      <p class="small">Federal Reserve, Survey of Consumer Finances</p>
+      <div class="cta">Would you want to see <b>your</b> number?</div>
+    </div>
+  </div>
+  <div id="start">
+    <button id="playBtn">&#9654;&nbsp; Play</button>
+    <p>Space pause &middot; R restart &middot; &larr; &rarr; seek 5s &middot; H hide UI</p>
+  </div>
+  <div id="timebar"><i></i></div>
+  <div id="err"></div>
+</div>
+<script>
+window.onerror = (m, s, l, c) => {
+  const e = document.getElementById('err');
+  e.style.display = 'block';
+  e.textContent += `${m} @ ${(s || '').split('/').pop()}:${l}:${c}\n`;
+};
+</script>
+<script src="lib/three.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/field.js"></script>
+<script src="js/world.js"></script>
+<script src="js/people.js"></script>
+<script src="js/labels.js"></script>
+<script src="js/director.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
