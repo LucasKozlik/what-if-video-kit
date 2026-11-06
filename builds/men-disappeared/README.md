@@ -6,12 +6,13 @@ Built from `prompts/what-if-men-disappeared-beach.md` with the disaster-animatio
 - Open `index.html` in Chrome to watch it (Space pause, ← → seek, H hide HUD).
 - The whole scene is a pure function of film time, so `?shot=12.5` renders any instant.
 - `node tools/pw-shoot.mjs 3 6.2 9` — headless stills (Playwright + SwiftShader) into `tools/shots/`.
+- `python3 tools/sfx.py` — synthesizes the synced soundtrack + sound effects to `tools/out/sfx.wav`.
 - `node tools/pw-export.mjs --w=1080 --fps=30` — frame-exact PNGs into `tools/frames/`; split
   long renders with `--from/--to` and run them in parallel. Encode with ffmpeg (see below).
 
 ```
-ffmpeg -framerate 30 -i tools/frames/f_%06d.png -i tools/out/audio.m4a \
-  -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -c:a copy -shortest -movflags +faststart out.mp4
+ffmpeg -framerate 30 -i tools/frames/f_%06d.png -i tools/out/sfx.wav \
+  -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest -movflags +faststart out.mp4
 ```
 
 Story beats: cold open on the ending (everyone gathered, staring) under the title → 3:12 PM POV with
