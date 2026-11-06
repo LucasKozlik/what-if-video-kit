@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What If You Could See Everyone’s Money?</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="grain"></canvas>
+  <div id="vignette"></div>
+  <div id="flash"></div>
+  <div id="hud">
+    <div id="title">
+      <span class="l1">WHAT IF YOU COULD SEE</span>
+      <span class="l2">HOW MUCH MONEY</span>
+      <span class="l3"><em>EVERYONE</em> HAS?</span>
+    </div>
+    <div id="tags"></div>
+    <div id="counter">
+      <div class="col main">
+        <div class="eyebrow">YOUR NUMBER</div>
+        <div class="big" id="len">$1,240.18</div>
+        <div class="sub" id="sub">NET WORTH · LIVE</div>
+      </div>
+      <div class="col dayc">
+        <div class="eyebrow">RICHEST IN VIEW</div>
+        <div class="big" id="day">—</div>
+      </div>
+    </div>
+    <div id="fx"></div>
+    <div id="caption"></div>
+    <div id="endcard">
+      <div class="tag l">REAL FACT</div>
+      <p class="l">In 2022, the typical U.S. family had a net worth of about <b>$192,900</b>.</p>
+      <p class="l small">That’s the median from the Federal Reserve’s Survey of Consumer Finances. The average was over $1 million, pulled up by the very top.</p>
+      <div class="cta l">What would <b>your</b> number say?</div>
+    </div>
+  </div>
+  <div id="start">
+    <button id="playBtn">▶&nbsp; Play with sound</button>
+    <p>Space pause · R restart · ← → seek 5s · H hide UI</p>
+  </div>
+  <div id="timebar"><i></i></div>
+  <div id="err"></div>
+</div>
+<audio id="audio" src="audio/soundtrack.wav" preload="auto"></audio>
+<script>
+window.onerror = (m, s, l, c) => {
+  const e = document.getElementById('err');
+  e.style.display = 'block';
+  e.textContent += `${m} @ ${(s || '').split('/').pop()}:${l}:${c}\n`;
+};
+</script>
+<script src="lib/three.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/cues.js"></script>
+<script src="js/rig.js"></script>
+<script src="js/sets.js"></script>
+<script src="js/story.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
