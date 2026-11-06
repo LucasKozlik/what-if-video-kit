@@ -145,6 +145,14 @@ Then, after you've watched it:
 
 ---
 
+## Ready-made video prompts
+
+Full kickoff prompts for specific videos live in [`prompts/`](prompts/):
+
+- [What if your nose grew bigger every day?](prompts/what-if-your-nose-grew-every-day.md) — ten days, a luxury house, a wife and two kids, and only his nose grows.
+
+---
+
 ## Debugging prompts that actually work
 
 | Symptom | What to say |
