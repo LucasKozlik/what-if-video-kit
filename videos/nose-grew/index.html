@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What If Your Nose Grew Bigger Every Day?</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="grain"></canvas>
+  <div id="vignette"></div>
+  <div id="flash"></div>
+  <div id="hud">
+    <div id="title">
+      <span class="l1">WHAT IF YOUR</span>
+      <span class="l2">NOSE GREW</span>
+      <span class="l3">BIGGER <em>EVERY DAY?</em></span>
+    </div>
+    <div id="counter">
+      <div class="col main">
+        <div class="eyebrow">NOSE LENGTH</div>
+        <div class="big" id="len">5.0<small>cm</small></div>
+        <div class="sub" id="sub">DAY 1 OF 10 · +80% A DAY</div>
+      </div>
+      <div class="col dayc">
+        <div class="eyebrow">DAY</div>
+        <div class="big" id="day">1</div>
+      </div>
+    </div>
+    <div id="stamp">DAY 1</div>
+    <div id="fx"></div>
+    <div id="caption"></div>
+    <div id="endcard">
+      <div class="tag l">REAL FACT</div>
+      <p class="l">In real life, noses really do look <b>bigger as we age</b>.</p>
+      <p class="l small">Skin and cartilage lose their stiffness, and gravity slowly pulls the tip down and longer.</p>
+      <div class="cta l">Would you still love him on <b>Day&nbsp;10?</b></div>
+    </div>
+  </div>
+  <div id="start">
+    <button id="playBtn">▶&nbsp; Play with sound</button>
+    <p>Space pause · R restart · ← → seek 5s · H hide UI</p>
+  </div>
+  <div id="timebar"><i></i></div>
+  <div id="err"></div>
+</div>
+<audio id="audio" src="audio/soundtrack.wav" preload="auto"></audio>
+<script>
+window.onerror = (m, s, l, c) => {
+  const e = document.getElementById('err');
+  e.style.display = 'block';
+  e.textContent += `${m} @ ${(s || '').split('/').pop()}:${l}:${c}\n`;
+};
+</script>
+<script src="lib/three.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/cues.js"></script>
+<script src="js/rig.js"></script>
+<script src="js/sets.js"></script>
+<script src="js/story.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

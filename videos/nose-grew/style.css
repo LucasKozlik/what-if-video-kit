@@ -1,0 +1,82 @@
+/* 9:16 stage, type in cqw so the HUD is identical at preview size and at 1080x1920. */
+html, body { margin: 0; height: 100%; background: #08080a; overflow: hidden;
+  font-family: 'Liberation Sans', 'Helvetica Neue', Arial, sans-serif; }
+#stage { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  aspect-ratio: 9 / 16; height: 100%; max-width: 100%; container-type: size; overflow: hidden; background: #000; }
+@media (max-aspect-ratio: 9/16) { #stage { width: 100%; height: auto; } }
+#gl, #grain, #vignette, #hud, #flash { position: absolute; inset: 0; width: 100%; height: 100%; }
+#gl { filter: contrast(1.14) saturate(1.28) sepia(0.08); }
+#grain { opacity: 0.03; mix-blend-mode: overlay; pointer-events: none; }
+#vignette { pointer-events: none; background: radial-gradient(ellipse at 50% 46%, rgba(0,0,0,0) 60%, rgba(20,8,0,0.34) 100%); }
+#flash { background: #fff6e8; opacity: 0; pointer-events: none; }
+#hud { pointer-events: none; color: #fff; }
+.hidehud #hud, .hidehud #timebar { display: none; }
+
+/* ---- title (cold open) ---- */
+#title { position: absolute; top: 24%; left: 0; right: 0; text-align: center; opacity: 0; transform-origin: 50% 40%; }
+#title span { display: block; line-height: 1.0; font-family: 'Liberation Serif', 'Times New Roman', serif; font-weight: 700;
+  color: #fff8ec; text-shadow: 0 0.5cqw 2.2cqw rgba(40,10,0,.55), 0 0 0.4cqw rgba(0,0,0,.4); }
+#title .l1 { font-size: 7.4cqw; letter-spacing: 0.08em; font-family: 'Liberation Sans', Arial, sans-serif; font-weight: 700; }
+#title .l2 { font-size: 15.5cqw; color: #ffc94a; letter-spacing: -0.01em; margin: 1cqw 0; }
+#title .l3 { font-size: 8.6cqw; font-style: italic; }
+#title .l3 em { color: #ffc94a; }
+
+/* ---- counter: eyebrow / big serif number / grey sub-line, DAY column in the same row ---- */
+#counter { position: absolute; top: 13%; left: 6%; right: 18%; display: flex; gap: 4cqw; align-items: flex-start; opacity: 0; }
+#counter .col { display: flex; flex-direction: column; }
+#counter .main { flex: 1 1 auto; min-width: 0; }
+#counter .dayc { flex: 0 0 auto; align-items: flex-end; text-align: right; }
+.eyebrow { font-size: 2.7cqw; letter-spacing: 0.22em; font-weight: 700; color: rgba(255,255,255,.88);
+  text-shadow: 0 0.3cqw 1cqw rgba(0,0,0,.6); }
+.big { font-family: 'Liberation Serif', 'Times New Roman', serif; font-weight: 700; font-size: 12cqw; line-height: 1;
+  margin: 0.8cqw 0 1.2cqw; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; transform-origin: 0 60%;
+  text-shadow: 0 0.5cqw 2cqw rgba(0,0,0,.55); }
+.big small { font-size: 0.48em; margin-left: 0.18em; font-weight: 400; }
+#counter .dayc .big { transform-origin: 100% 60%; color: #ffc94a; }
+.sub { font-size: 2.6cqw; letter-spacing: 0.12em; color: #d0d0d0; font-weight: 700; white-space: nowrap;
+  text-shadow: 0 0.3cqw 1cqw rgba(0,0,0,.6); }
+
+/* ---- DAY stamp ---- */
+#stamp { position: absolute; left: 50%; top: 29%; transform: translate(-50%,-50%); opacity: 0;
+  font-family: 'Liberation Sans', Arial, sans-serif; font-weight: 700; font-size: 9cqw; letter-spacing: 0.16em;
+  color: #fff8ec; padding: 1.2cqw 4cqw; border: 0.7cqw solid #ffc94a; border-radius: 1.4cqw;
+  background: rgba(20,12,6,.35); text-shadow: 0 0.4cqw 1.5cqw rgba(0,0,0,.5); white-space: nowrap; }
+
+/* ---- comic FX words ---- */
+#fx { position: absolute; inset: 0; overflow: hidden; }
+#fx .w { position: absolute; white-space: nowrap; font-family: 'Liberation Sans', Arial, sans-serif; font-weight: 700;
+  font-size: 8cqw; color: #ffe14a; -webkit-text-stroke: 0.6cqw #2a1205; paint-order: stroke fill; letter-spacing: 0.02em;
+  text-shadow: 0 0.6cqw 0 rgba(0,0,0,.35); }
+#fx .w.small { font-size: 5.5cqw; }
+#fx .w.pink { color: #ff8fb8; font-style: italic; }
+#fx .w.zz { font-size: 6cqw; color: #cfe0ff; -webkit-text-stroke: 0.45cqw #10142a; font-family: 'Liberation Serif', serif; font-style: italic; }
+
+/* ---- captions: italic serif, cream, accent words in warm gold ---- */
+#caption { position: absolute; top: 66%; left: 7%; right: 18%; text-align: center; font-family: 'Liberation Serif', 'Times New Roman', serif;
+  font-style: italic; font-size: 7.4cqw; line-height: 1.12; color: #f3ede3; }
+#caption::before { content: ''; position: absolute; left: -6%; right: -6%; top: -30%; bottom: -30%; z-index: -1;
+  background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,.34) 0%, rgba(0,0,0,0) 70%); }
+#caption span { display: inline-block; opacity: 0; text-shadow: 0 0.4cqw 1.4cqw rgba(0,0,0,.75), 0 0 0.3cqw rgba(0,0,0,.6); }
+#caption span.em { color: #ffc94a; font-weight: 700; }
+
+/* ---- end card ---- */
+#endcard { position: absolute; inset: 0; padding: 0 12% 0 9%; display: flex; flex-direction: column; justify-content: center;
+  text-align: center; opacity: 0; background: linear-gradient(rgba(10,4,0,.2), rgba(10,4,0,.72) 32%, rgba(10,4,0,.72) 70%, rgba(10,4,0,.25)); }
+#endcard .tag { align-self: center; background: #ffc94a; color: #1a1006; font-weight: 700; font-size: 4.2cqw; letter-spacing: 0.2em;
+  padding: 1.2cqw 4cqw; border-radius: 1.2cqw; margin-bottom: 5cqw; }
+#endcard p { font-family: 'Liberation Serif', 'Times New Roman', serif; font-size: 6.6cqw; line-height: 1.25; margin: 0 0 3.5cqw; color: #f8f1e6; }
+#endcard p b { color: #ffc94a; }
+#endcard p.small { font-family: 'Liberation Sans', Arial, sans-serif; font-size: 4.3cqw; color: #d6d0c6; line-height: 1.4; }
+#endcard .cta { margin-top: 6cqw; font-family: 'Liberation Serif', serif; font-style: italic; font-size: 7.6cqw; color: #fff; line-height: 1.15; }
+#endcard .cta b { color: #ffc94a; font-style: normal; }
+
+#start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.45); z-index: 5; }
+#start.gone { display: none; }
+#start button { font: inherit; font-weight: 700; font-size: 5.5cqw; padding: 3cqw 7cqw; border: 0; border-radius: 10cqw;
+  background: #ffc94a; color: #111; cursor: pointer; box-shadow: 0 1cqw 4cqw rgba(0,0,0,.5); }
+#start p { color: #ddd; font-size: 2.8cqw; margin-top: 3cqw; }
+#timebar { position: absolute; left: 0; right: 0; bottom: 0; height: 0.6cqw; background: rgba(255,255,255,.12); z-index: 4; }
+#timebar i { display: block; height: 100%; width: 0; background: #ffc94a; }
+#err { display: none; position: absolute; left: 0; right: 0; top: 0; z-index: 9; background: rgba(160,0,0,.9); color: #fff;
+  font: 12px monospace; white-space: pre-wrap; padding: 8px; }
