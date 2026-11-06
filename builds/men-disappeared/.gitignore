@@ -1,0 +1,5 @@
+tools/frames/
+tools/shots/
+tools/out/
+tools/node_modules
+tools/*.log

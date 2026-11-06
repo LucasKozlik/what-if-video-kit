@@ -1,0 +1,60 @@
+/* 9:16 stage; all type in cqw so preview and 1080x1920 export match.
+   Serif headline + italic serif captions + letterspaced sans support. */
+html, body { margin: 0; height: 100%; background: #050506; overflow: hidden; }
+#stage { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  aspect-ratio: 9 / 16; height: 100%; max-width: 100%; container-type: size; overflow: hidden; background: #000; }
+@media (max-aspect-ratio: 9/16) { #stage { width: 100%; height: auto; } }
+#gl, #grain, #vignette, #hud { position: absolute; inset: 0; width: 100%; height: 100%; }
+#grain { opacity: 0.03; mix-blend-mode: overlay; pointer-events: none; }
+#vignette { pointer-events: none; background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 60%, rgba(20,10,0,0.32) 100%); }
+#hud { pointer-events: none; color: #fff; }
+.hidehud #hud, .hidehud #timebar { display: none; }
+:root { --serif: Cambria, Caladea, 'Times New Roman', 'Liberation Serif', serif;
+        --sans: Inter, 'Segoe UI', system-ui, sans-serif; --accent: #ffcf3f; --cream: #fff4dc; }
+
+/* title card */
+#hook { position: absolute; top: 19%; left: 7%; right: 16%; text-align: center; opacity: 0; }
+#hook span { display: block; text-shadow: 0 0.4cqw 2.4cqw rgba(0,0,0,.55), 0 0 0.6cqw rgba(0,0,0,.5); }
+#hook .eyebrow { font-family: var(--sans); font-weight: 800; letter-spacing: 0.32em; font-size: 4.2cqw; margin-bottom: 1.6cqw; padding-left: .32em; }
+#hook .l2 { font-family: var(--serif); font-weight: 700; font-size: 10.4cqw; line-height: 1.0; }
+#hook .l3 { font-family: var(--serif); font-weight: 700; font-style: italic; font-size: 13cqw; color: var(--accent); line-height: 1.1; margin-top: 1cqw; }
+
+/* top-left counter — clear of TikTok's top bar */
+#counter { position: absolute; left: 6%; top: 13%; opacity: 0; }
+#counter label { display: block; font-family: var(--sans); font-weight: 800; font-size: 2.7cqw; letter-spacing: 0.22em; color: #fff;
+  text-shadow: 0 0.3cqw 1.2cqw rgba(0,0,0,.6); }
+#counter b { display: block; font-family: var(--serif); font-weight: 700; font-size: 8.6cqw; line-height: 1; margin-top: 1cqw;
+  font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; text-shadow: 0 0.4cqw 1.8cqw rgba(0,0,0,.6); }
+#counter small { display: block; font-family: var(--sans); font-weight: 600; font-size: 2.8cqw; color: #d9dde2; margin-top: 1.1cqw;
+  text-shadow: 0 0.3cqw 1.2cqw rgba(0,0,0,.7); }
+#counter.one b { color: var(--accent); font-size: 13cqw; }
+#counter.one small { color: var(--accent); }
+
+/* captions */
+#caption { position: absolute; top: 62%; left: 7%; right: 17%; text-align: center;
+  font-family: var(--serif); font-style: italic; font-size: 7cqw; line-height: 1.12; color: var(--cream); }
+#caption span { display: inline-block; opacity: 0;
+  text-shadow: 0 0.3cqw 0.6cqw rgba(0,0,0,.75), 0 0.5cqw 2.5cqw rgba(0,0,0,.6); }
+#caption span.em { color: var(--accent); font-weight: 700; }
+
+/* end card */
+#endcard { position: absolute; inset: 0; padding: 0 15% 0 9%; display: flex; flex-direction: column;
+  justify-content: center; text-align: center; opacity: 0;
+  background: linear-gradient(rgba(8,10,14,.35), rgba(8,10,14,.82) 32%, rgba(8,10,14,.82) 72%, rgba(8,10,14,.4)); }
+#endcard .tag { align-self: center; font-family: var(--sans); font-weight: 800; letter-spacing: 0.24em; font-size: 3cqw;
+  color: #111; background: var(--accent); padding: 1cqw 3cqw 1cqw 3.3cqw; border-radius: 1cqw; margin-bottom: 5cqw; }
+#endcard p { font-family: var(--sans); font-weight: 500; font-size: 4.3cqw; line-height: 1.35; margin: 0 0 3.2cqw; color: #e9ecef; }
+#endcard p b { color: var(--accent); font-weight: 700; }
+#endcard p.big { font-family: var(--serif); font-weight: 700; font-size: 7.4cqw; line-height: 1.15; color: #fff; }
+#endcard p.src { font-size: 3cqw; color: #aab1b9; letter-spacing: 0.04em; }
+#endcard .cta { margin-top: 6cqw; font-family: var(--serif); font-style: italic; font-weight: 700; font-size: 7.6cqw; color: var(--cream); line-height: 1.15; }
+
+#start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; background: rgba(0,0,0,.45); z-index: 5; }
+#start.gone { display: none; }
+#start button { font: 700 5.5cqw var(--sans); padding: 3cqw 7cqw; border: 0; border-radius: 10cqw; background: var(--accent); color: #111; cursor: pointer; }
+#start p { color: #ddd; font-family: var(--sans); font-size: 2.8cqw; margin-top: 3cqw; }
+#timebar { position: absolute; left: 0; right: 0; bottom: 0; height: 0.6cqw; background: rgba(255,255,255,.12); z-index: 4; }
+#timebar i { display: block; height: 100%; width: 0; background: var(--accent); }
+#err { display: none; position: absolute; left: 0; right: 0; top: 0; z-index: 9;
+  background: rgba(160,0,0,.9); color: #fff; font: 12px monospace; white-space: pre-wrap; padding: 8px; }

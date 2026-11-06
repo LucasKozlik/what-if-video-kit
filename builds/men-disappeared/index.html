@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What If Every Man Disappeared</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <canvas id="grain"></canvas>
+  <div id="vignette"></div>
+  <div id="hud">
+    <div id="hook">
+      <span class="eyebrow">WHAT IF</span>
+      <span class="l2">every man disappeared</span>
+      <span class="l3">except you?</span>
+    </div>
+    <div id="counter">
+      <label>MEN ON EARTH</label>
+      <b id="men">4,080,000,000</b>
+      <small id="menSub">and counting</small>
+    </div>
+    <div id="caption"></div>
+    <div id="endcard">
+      <div class="it tag">REAL FACT</div>
+      <p class="it big">There are about<br><b>101 men</b> for every<br><b>100 women</b> on Earth.</p>
+      <p class="it">Men slightly outnumber women worldwide &mdash; roughly <b>4.1 billion</b> men.</p>
+      <p class="it src">Source: UN World Population Prospects</p>
+      <div class="it cta">What&rsquo;s the first thing<br>you&rsquo;d do? <span>👇</span></div>
+    </div>
+  </div>
+  <div id="start">
+    <button id="playBtn">▶&nbsp; Play</button>
+    <p>Space pause · R restart · ← → seek 2s · H hide UI</p>
+  </div>
+  <div id="timebar"><i></i></div>
+  <div id="err"></div>
+</div>
+<script>
+window.onerror = (m, s, l, c) => {
+  const e = document.getElementById('err');
+  e.style.display = 'block';
+  e.textContent += `${m} @ ${(s || '').split('/').pop()}:${l}:${c}\n`;
+};
+</script>
+<script src="lib/three.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/world.js"></script>
+<script src="js/people.js"></script>
+<script src="js/director.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
