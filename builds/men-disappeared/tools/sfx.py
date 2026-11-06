@@ -14,7 +14,7 @@ from scipy import signal
 import wave, os
 
 SR = 48000
-DUR = 41.5
+DUR = 61.0
 N = int(SR * DUR)
 rng = np.random.default_rng(7)
 t = np.arange(N) / SR
@@ -25,7 +25,9 @@ JS_BEACH = (150 - 31) / 7.2            # 16.53 s
 CUTS = [0, 2.2, 7.7, 10.4, 13.0, 15.6, 18.6, 21.4, 24.4, 30.0, 35.4]
 SHOT = {'cold': (0, 2.2), 'pov1': (2.2, 7.7), 'volley': (7.7, 10.4), 'couple': (10.4, 13.0),
         'grill': (13.0, 15.6), 'jetski': (15.6, 18.6), 'tower': (18.6, 21.4), 'wide': (21.4, 24.4),
-        'overhead': (24.4, 30.0), 'pov2': (30.0, 41.5)}
+        'overhead': (24.4, 30.0), 'pov2': (30.0, 38.2), 'ring': (38.2, 41.6), 'povrun': (41.6, 44.6),
+        'front': (44.6, 48.4), 'side': (48.4, 51.8), 'pull': (51.8, 61.0)}
+END = 55.0
 
 
 def S(sec): return int(round(sec * SR))
@@ -69,8 +71,9 @@ wash_env = np.clip(np.sin(wave_ph - 0.6), 0, 1) ** 6
 wash = bp(noise(N), 1500, 7000) * wash_env
 roar2 = lp(noise(N), 500) * swell        # decorrelated R channel
 surf_lvl = shot_gain({'cold': 0.10, 'pov1': 0.18, 'volley': 0.16, 'couple': 0.16, 'grill': 0.14,
-                      'jetski': 0.32, 'tower': 0.30, 'wide': 0.16, 'overhead': 0.10, 'pov2': 0.12})
-surf_lvl *= 1 - 0.75 * smooth(35.4, 37.0, t)
+                      'jetski': 0.32, 'tower': 0.30, 'wide': 0.16, 'overhead': 0.10, 'pov2': 0.12,
+                      'ring': 0.08, 'povrun': 0.16, 'front': 0.14, 'side': 0.34, 'pull': 0.18})
+surf_lvl *= 1 - 0.7 * smooth(END, END + 1.5, t)
 L += (roar * 1.0 + wash * 0.22) * surf_lvl
 R += (roar2 * 1.0 + wash * 0.22) * surf_lvl
 
@@ -90,13 +93,16 @@ def voices(n_voices, lo, hi, seed):
 men = voices(8, 220, 420, 11)       # lower voices: gone at the event
 women = voices(10, 450, 900, 12)
 crowd_lvl = shot_gain({'cold': 0.05, 'pov1': 0.16, 'volley': 0.14, 'couple': 0.14, 'grill': 0.12,
-                       'jetski': 0.07, 'tower': 0.09, 'wide': 0.16, 'overhead': 0.10, 'pov2': 0.12})
+                       'jetski': 0.07, 'tower': 0.09, 'wide': 0.16, 'overhead': 0.10, 'pov2': 0.12,
+                       'ring': 0.14, 'povrun': 0.16, 'front': 0.2, 'side': 0.16, 'pull': 0.12})
 men_g = crowd_lvl * (1 - smooth(T_EVENT, T_EVENT + 0.08, t))
 # women: everyone stops mid-sentence, a beat of silence, then confused chatter builds;
 # while they all stare at you it hushes again
 wom_g = crowd_lvl * (1 - 0.9 * smooth(T_EVENT + 0.15, T_EVENT + 0.6, t) * (1 - smooth(9.0, 12.0, t)))
 wom_g *= 1 + 0.6 * smooth(19, 23, t) * (1 - smooth(24.4, 26.5, t))
-wom_g *= 1 - 0.8 * smooth(26.0, 29.0, t)
+wom_g *= 1 - 0.8 * smooth(26.0, 29.0, t) * (1 - smooth(35.6, 37.5, t))   # hush while staring, then excited
+wom_g *= 1 + 0.9 * smooth(41.6, 43.0, t)                                    # the chase: shrieks and chatter
+wom_g *= 1 - 0.85 * smooth(END, END + 1.5, t)
 wom_g *= np.where(t < 2.2, 0.0, 1.0) + np.where(t < 2.2, 1.0, 0.0) * 0.4
 L += men * men_g * 0.9 + women * wom_g
 R += men[::-1] * 0 + np.roll(men, S(0.013)) * men_g * 0.9 + np.roll(women, S(0.011)) * wom_g
@@ -180,6 +186,7 @@ dg = 0.045 * smooth(T_EVENT, 9, t) * (1 - 0.5 * smooth(13, 15, t)) + 0.05 * smoo
 dg *= 1 - smooth(30.0, 30.05, t) * 0.7
 dg = np.where(t < 2.2, 0.05, dg)
 dg *= 1 - smooth(35.4, 36.5, t)
+dg += 0.05 * smooth(38.2, 41.0, t) * (1 - smooth(41.55, 41.65, t))
 L += dr * dg; R += dr * dg
 
 # grill: sizzle that turns to a hiss + crackle once nobody is minding it
@@ -255,8 +262,8 @@ L += riser * 0.07 + riser_t * 0.03; R += riser * 0.07 + riser_t * 0.03
 
 # POV stare: heartbeat (lub-dub), quickening slightly
 hb_t, x = [], 30.15
-while x < 35.6:
-    hb_t.append(x); x += 60 / (68 + 14 * (x - 30) / 5.5)
+while x < 38.0:
+    hb_t.append(x); x += 60 / (68 + 30 * smooth(30, 38, x))
 for at in hb_t:
     add(thud(52, 0.22, 0.1, 400), at, 0.55)
     add(thud(48, 0.18, 0.05, 400), at + 0.16, 0.35)
@@ -266,16 +273,85 @@ def boom(g, at):
     nn = S(1.2); tt = np.arange(nn) / SR
     b = np.sin(2 * np.pi * (60 * np.exp(-tt * 1.5) + 35) * tt) * np.exp(-tt / 0.35)
     add(b + lp(noise(nn), 200) * np.exp(-tt / 0.05) * 0.6, at, g)
-boom(0.5, 0.0); boom(0.35, 2.2); boom(0.45, 35.4)
+boom(0.5, 0.0); boom(0.35, 2.2); boom(0.55, 41.6); boom(0.45, END)
 pad = sum(np.sin(2 * np.pi * fr * t + k) for k, fr in enumerate([220, 277.2, 329.6, 440]))
-pad = lp(pad, 1200) * 0.018 * smooth(35.6, 37.5, t) * (1 - smooth(40.2, 41.4, t))
+pad = lp(pad, 1200) * 0.02 * smooth(END + 0.2, END + 2, t) * (1 - smooth(DUR - 1.3, DUR - 0.1, t))
 L += pad; R += pad
 
 # a little whoosh on the hard cuts so the edit breathes
 nn = S(0.35); tt = np.arange(nn) / SR
 wh = bp(noise(nn), 600, 5000) * np.sin(np.pi * np.minimum(1, tt / 0.35)) ** 2
-for c in [7.7, 10.4, 13.0, 15.6, 18.6, 21.4, 24.4]:
+for c in [7.7, 10.4, 13.0, 15.6, 18.6, 21.4, 24.4, 38.2, 44.6, 48.4, 51.8]:
     add(wh, c - 0.18, 0.05, 0.0)
+
+# ---------------------------------------------------------------- the chase (35.4 - 55)
+# hearts popping over every head: little rising "bloop"s
+r3 = np.random.default_rng(31)
+for k in range(24):
+    at = 35.8 + r3.uniform(0, 2.2)
+    nn = S(0.16); tt = np.arange(nn) / SR
+    f = 500 + 1400 * (tt / 0.16) ** 0.7
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    add(np.sin(ph) * np.sin(np.pi * tt / 0.16) ** 0.5, at, 0.05 * r3.uniform(0.6, 1), r3.uniform(-0.7, 0.7))
+# "uh-oh": two falling notes as the ring closes
+for at, f0, f1 in [(38.6, 520, 500), (38.95, 392, 330)]:
+    nn = S(0.32); tt = np.arange(nn) / SR
+    f = f0 + (f1 - f0) * tt / 0.32
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    x = (np.sin(ph) + 0.4 * np.sin(2 * ph) + 0.2 * np.sin(3 * ph)) * np.minimum(1, tt / 0.02) * np.exp(-tt / 0.22)
+    add(lp(x, 2500), at, 0.10)
+# tension riser into the cut
+nn = S(3.4); tt = np.arange(nn) / SR
+rz = bp(noise(nn), 500, 7000) * (tt / 3.4) ** 2.5
+add(rz, 38.2, 0.12)
+
+# chase beat: 152 bpm kick / snare / hats + a driving bass line, 41.6 -> end card
+BPM = 152; beat = 60 / BPM
+def kick():
+    nn = S(0.25); tt = np.arange(nn) / SR
+    return np.sin(2 * np.pi * (45 + 90 * np.exp(-tt * 30)) * tt) * np.exp(-tt / 0.12)
+def snare():
+    nn = S(0.2); tt = np.arange(nn) / SR
+    return bp(noise(nn), 1200, 7000) * np.exp(-tt / 0.06) + np.sin(2 * np.pi * 190 * tt) * np.exp(-tt / 0.04) * 0.5
+def hat():
+    nn = S(0.05); tt = np.arange(nn) / SR
+    return hp(noise(nn), 7000) * np.exp(-tt / 0.012)
+mus = np.zeros(N)
+def madd(x, at, g):
+    i = S(at)
+    if 0 <= i < N: mus[i:i + len(x)] += x[:N - i] * g
+b = 41.6; n = 0
+bass_notes = [55, 55, 65.4, 55, 73.4, 55, 65.4, 49]
+while b < END + 0.6:
+    madd(kick(), b, 0.9 if n % 2 == 0 else 0.7)
+    if n % 2 == 1: madd(snare(), b, 0.55)
+    madd(hat(), b, 0.25); madd(hat(), b + beat / 2, 0.18)
+    nn = S(beat * 0.95); tt = np.arange(nn) / SR
+    fb = bass_notes[(n // 2) % len(bass_notes)]
+    bass = lp(signal.sawtooth(2 * np.pi * fb * tt) + 0.5 * signal.square(2 * np.pi * fb * 0.5 * tt), 500) * np.exp(-tt / 0.35)
+    madd(bass, b, 0.35)
+    b += beat; n += 1
+mus_g = smooth(41.55, 41.7, t) * (1 - smooth(END - 0.2, END + 0.6, t)) * 0.2
+L += mus * mus_g; R += np.roll(mus, S(0.004)) * mus_g
+
+# your running feet (heavy, close in POV) and a stampede of feet behind you
+fs, x = [], 42.45
+while x < END + 0.5:
+    fs.append(x); x += 0.17
+pov_run = shot_gain({'povrun': 1.0, 'front': 0.45, 'side': 0.25, 'pull': 0.1})
+for at in fs:
+    nn = S(0.12); tt = np.arange(nn) / SR
+    st = lp(noise(nn), 900) * np.exp(-tt / 0.025) + bp(noise(nn), 1500, 5000) * np.exp(-tt / 0.04) * 0.4
+    i = S(at); g = pov_run[min(i, N - 1)] * 0.3
+    add(st, at, g, 0.05 if int(at / 0.17) % 2 else -0.05)
+stamp = np.zeros(N); r4 = np.random.default_rng(77)
+for k in range(1600):
+    at = r4.uniform(42.6, END + 0.5)
+    nn = S(0.1); tt = np.arange(nn) / SR
+    st = bp(noise(nn, r4), 250, 3000) * np.exp(-tt / 0.025)
+    i = S(at); stamp[i:i + nn] += st[:N - i] * r4.uniform(0.3, 1.0)
+st_g = shot_gain({'povrun': 0.05, 'front': 0.12, 'side': 0.10, 'pull': 0.06}) * (1 - smooth(END, END + 1.2, t))
+L += stamp * st_g; R += np.roll(stamp, S(0.009)) * st_g
 
 # ---------------------------------------------------------------- master
 mix = np.stack([L, R], 1)

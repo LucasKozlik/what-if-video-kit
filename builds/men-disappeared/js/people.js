@@ -56,6 +56,45 @@ function gaitInto(P, phase, amp, s) {
   P.torY = 0.1 * Math.sin(phase) * amp;
   P.hipH = 0.93 * s - Math.abs(Math.cos(phase)) * 0.05 * s * amp;
 }
+function gaitRun(P, phase, amp, s) {
+  const hipA = 0.8 * amp, kn = 1.5;
+  P.lie = 0;
+  P.lHipX = -hipA * Math.sin(phase) - 0.25 * amp; P.rHipX = hipA * Math.sin(phase) - 0.25 * amp;
+  P.lHipZ = 0.04; P.rHipZ = -0.04;
+  P.lKnX = (0.2 + kn * Math.max(0, Math.cos(phase)) ** 1.2) * amp;
+  P.rKnX = (0.2 + kn * Math.max(0, -Math.cos(phase)) ** 1.2) * amp;
+  P.lAnX = 0.35 * Math.sin(phase) * amp; P.rAnX = -0.35 * Math.sin(phase) * amp;
+  P.lShX = 0.75 * Math.sin(phase) * amp; P.rShX = -0.75 * Math.sin(phase) * amp;
+  P.lShZ = 0.12; P.rShZ = -0.12; P.lElX = -1.45 * amp; P.rElX = -1.45 * amp;
+  P.torX = 0.22 * amp; P.torY = 0.16 * Math.sin(phase) * amp; P.torZ = 0;
+  P.hipH = 0.93 * s - 0.06 * s * amp + Math.abs(Math.sin(phase)) * 0.05 * s * amp;
+}
+// ---- your escape route: diagonally down to the waterline, then along it
+const RUN_T = 42.4, RUN_V = 5.4;
+const RUN_A = { x: 0, z: 0.3 }, RUN_B = { x: 12, z: 26 };
+const RUN_L1 = Math.hypot(RUN_B.x - RUN_A.x, RUN_B.z - RUN_A.z);
+const RUN_H1 = Math.atan2(RUN_B.x - RUN_A.x, RUN_B.z - RUN_A.z);
+function youD(t) { const u = t - RUN_T; return u <= 0 ? 0 : RUN_V * (u - (1 - Math.exp(-2.5 * u)) / 2.5); }
+function pathAt(d) {
+  if (d <= RUN_L1) return { x: RUN_A.x + Math.sin(RUN_H1) * d, z: RUN_A.z + Math.cos(RUN_H1) * d, h: RUN_H1 };
+  const e = d - RUN_L1, turn = smooth(0, 5, e);
+  return { x: RUN_B.x + e, z: RUN_B.z + 0.2 * Math.sin(e * 0.15), h: angLerp(RUN_H1, Math.PI / 2, turn) };
+}
+function youPos(t) { const p = pathAt(youD(t)); return new THREE.Vector3(p.x, 0, p.z); }
+function groundY(x, z) { return z > SHORE - 4 ? -(z - (SHORE - 4)) * 0.09 : 0; }
+// Each woman runs your route a little behind you, spread sideways, slowly dropping back.
+function chasePos(p, rx, rz, t) {
+  const C = p.react.chase;
+  const t0 = RUN_T + C.delay;
+  const dTrail = youD(t - C.lag) * 0.95;
+  const P1 = pathAt(Math.max(0, dTrail - 0.6)), P2 = pathAt(dTrail);
+  const fh = Math.atan2(P2.x - P1.x, P2.z - P1.z + 1e-6);
+  const off = C.off * smooth(0, 6, dTrail);
+  const tx = P2.x + Math.cos(fh) * off, tz = P2.z - Math.sin(fh) * off;
+  const dist0 = Math.hypot(tx - rx, tz - rz);
+  const w = smooth(t0, t0 + 0.6 + C.far / 5, t);
+  return { x: lerp(rx, tx, w), z: lerp(rz, tz, w), d: dTrail * w + C.far * w };
+}
 function blendPose(A, B, w, out = {}) {
   for (const j of JOINTS) out[j] = A[j] + (B[j] - A[j]) * w;
   return out;
@@ -276,6 +315,30 @@ function behave(p, t) {
     const sp = us > 0 && us < 1 ? D / dur : 0;
     if (sp > 0.05) gaitInto(P, d / (1.45 * p.s) * Math.PI * 2, clamp(sp / 1.0, 0, 1) * smooth(0, 0.1, us) * (1 - smooth(0.9, 1, us)), p.s);
   }
+  // 4. it dawns on them: close in, then chase you down the beach
+  let chasing = false, target = YOU;
+  if (t > 38.2 && R.chase) {
+    const yp = youPos(t);
+    target = yp;
+    // close in on the ring while you are still sitting
+    const dd = Math.hypot(YOU.x - x, YOU.z - z), k = smooth(38.4, 41.4, t) * Math.max(0, dd - 1.4) * 0.45;
+    const hh0 = Math.atan2(YOU.x - x, YOU.z - z);
+    const rx = x + Math.sin(hh0) * k, rz = z + Math.cos(hh0) * k;
+    const cp = tt => chasePos(p, rx, rz, tt);
+    const c = cp(t), c1 = cp(t + 0.04), c0 = cp(t - 0.04);
+    const vx = (c1.x - c0.x) / 0.08, vz = (c1.z - c0.z) / 0.08, sp = Math.hypot(vx, vz);
+    x = c.x; z = c.z;
+    if (sp > 0.6 || t > RUN_T + 1) y = lerp(y, groundY(x, z), smooth(RUN_T, RUN_T + 1.2, t));
+    const ringSp = smooth(38.4, 38.9, t) * (1 - smooth(40.9, 41.4, t)) * 0.6;
+    if (sp > 0.6) {
+      chasing = true;
+      h = Math.atan2(vx, vz);
+      gaitRun(P, c.d / (2.4 * p.s) * Math.PI * 2 + p.seed, clamp(sp / 4, 0, 1), p.s);
+    } else if (ringSp > 0.05) {
+      gaitInto(P, (t - 38.4) * 1.3 * Math.PI + p.seed, ringSp, p.s);
+      h = Math.atan2(YOU.x - x, YOU.z - z);
+    }
+  }
   // head: look-around noise, or at a gaze target, or at you once facing
   let gy = 0, gx = P.headX;
   const look = 0.75 * noise1(t * 0.55 + p.seed * 3) + 0.25 * noise1(t * 1.7 + p.seed);
@@ -290,8 +353,9 @@ function behave(p, t) {
     gx = lerp(gx, 0, gw * 0.6);
   }
   if (wF > 0) {
-    const rel = clamp(angLerp(0, toYou - h, 1), -1.2, 1.2);
-    const dist = Math.hypot(YOU.x - x, YOU.z - z);
+    const toT = Math.atan2(target.x - x, target.z - z);
+    const rel = clamp(angLerp(0, toT - h, 1), -1.2, 1.2);
+    const dist = Math.hypot(target.x - x, target.z - z);
     gy = lerp(gy, rel, wF);
     const eye = (P.lie > 0.5 ? 0.3 : P.hipH + 0.75 * p.s) + y;
     gx = lerp(gx, Math.atan2(eye - 0.9, Math.max(1, dist)) * 0.9 - (P.torX || 0), wF);
@@ -300,7 +364,7 @@ function behave(p, t) {
     const w = smooth(R.recoil, R.recoil + 0.35, t) * (1 - smooth(R.recoil + 1.8, R.recoil + 2.6, t));
     P.torX = lerp(P.torX, -0.35, w); P.rShX = lerp(P.rShX, -2.0, w); P.rElX = lerp(P.rElX, -2.3, w); P.rShZ = lerp(P.rShZ, 0.15, w);
   }
-  P.headY = gy; P.headX = gx;
+  P.headY = gy; P.headX = chasing ? 0.05 : gx;
   // breathing so nobody is a statue
   P.torX += 0.012 * Math.sin(t * 1.6 + p.seed);
   return { P, x, y, z, h };
@@ -394,12 +458,33 @@ function cast() {
 }
 
 function buildPeople(scene) {
+  const heartTex = canvasTex(128, 128, (g, w) => {
+    g.translate(64, 70); g.scale(1, 1);
+    g.fillStyle = '#ff3b6b'; g.strokeStyle = '#ffffff'; g.lineWidth = 8;
+    g.beginPath(); g.moveTo(0, 38);
+    g.bezierCurveTo(-60, 0, -48, -54, 0, -26); g.bezierCurveTo(48, -54, 60, 0, 0, 38);
+    g.closePath(); g.stroke(); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.55)'; g.beginPath(); g.ellipse(-22, -22, 9, 6, -0.6, 0, 7); g.fill();
+  });
+  const HR = mulberry32(555);
+  let rank = 0;
   for (const o of cast()) {
+    if (o.sex === 'f') {
+      const near = Math.hypot(o.x, o.z) < 45;
+      o.react.chase = { lag: 0.9 + HR() * 2.6 + (near ? 0 : 1.5), delay: HR() * 0.7 + (near ? 0 : 0.6),
+                        off: (HR() - 0.5) * 6, far: 0 };
+      o.heartT = 35.8 + HR() * 2.2;
+      rank++;
+    }
     const p = new Person(o);
     const hd = o.h; p.y = o.y || 0;
     p.behave = t => behave(p, t);
     if (o.act === 'carry' || o.act === 'walk') p.walkVel = new THREE.Vector3(Math.sin(hd) * o.v, 0, Math.cos(hd) * o.v);
     scene.add(p.root);
+    if (o.sex === 'f') {
+      p.heart = new THREE.Sprite(new THREE.SpriteMaterial({ map: heartTex, transparent: true, depthWrite: false, fog: false }));
+      p.heart.visible = false; scene.add(p.heart);
+    }
     PEOPLE.list.push(p); PEOPLE.byName[o.name] = p;
   }
   // Snapshot the instant of the event: hands for the dropped props, and the sample
@@ -444,6 +529,17 @@ function poseAll(t) {
     const b = p.behave(t);
     p.apply(b.P, b.x, b.y, b.z, b.h);
     p.root.visible = !(p.sex === 'm' && t >= T_EVENT);
+    if (p.heart) {
+      const a = t - p.heartT;
+      p.heart.visible = a > 0;
+      if (a > 0) {
+        const pop = a < 0.35 ? 1 + 1.6 * Math.pow(a / 0.35 - 1, 3) + 0.9 * Math.pow(a / 0.35 - 1, 2) : 1;
+        const sc = 0.42 * Math.max(0, pop) * (1 + 0.08 * Math.sin(t * 6 + p.seed));
+        p.heart.scale.set(sc, sc, 1);
+        p.head.getWorldPosition(p.heart.position);
+        p.heart.position.y += 0.42 + 0.06 * Math.sin(t * 3 + p.seed);
+      }
+    }
   }
 }
 
@@ -498,5 +594,17 @@ function poseYou(t) {
   // small flinch at the event
   const f = smooth(T_EVENT, T_EVENT + 0.25, t) * (1 - smooth(T_EVENT + 0.6, T_EVENT + 1.4, t));
   P.torX -= 0.12 * f; P.lShX -= 0.15 * f; P.rShX -= 0.15 * f;
-  you.apply(P, 0, 0.03, -0.12, 0);
+  const st = youState(t);
+  if (st.up > 0) blendPose(P, basePose('stand', you.s), st.up, P);
+  if (st.run > 0) { const R2 = Object.assign({}, P); gaitRun(R2, st.phase, st.run, you.s); blendPose(P, R2, Math.min(1, st.run * 1.5), P); }
+  you.apply(P, st.x, st.y, st.z, st.h);
+}
+function youState(t) {
+  const up = smooth(41.7, 42.3, t);
+  const d = youD(t), pa = pathAt(d);
+  const sp = (youD(t + 0.03) - youD(t - 0.03)) / 0.06;
+  const h = angLerp(0, pa.h, smooth(41.9, 42.45, t));
+  const x = lerp(0, pa.x, smooth(41.7, 42.4, t)), z = lerp(-0.12, pa.z, smooth(41.7, 42.4, t));
+  return { up, run: clamp(sp / 4.5, 0, 1), phase: d / (2.5 * 0.8 / 0.97) * Math.PI * 2 / 1.0, x, z, h,
+           y: 0.03 * (1 - up) + groundY(x, z) * up, speed: sp };
 }

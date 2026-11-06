@@ -104,7 +104,8 @@ function render(T) {
 
   poseAll(t);
   poseYou(t);
-  PEOPLE.you.root.visible = DIR.pov || T < 2.2 || (DIR.shot >= 7 && DIR.shot <= 8);
+  PEOPLE.you.root.visible = true;
+  PEOPLE.you.head.visible = !DIR.pov; PEOPLE.you.torso.children[0].visible = !DIR.pov;
   writeProps(t);
   writeDust(t);
   updateHUD(T, el);

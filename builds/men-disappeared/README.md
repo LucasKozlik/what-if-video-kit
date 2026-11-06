@@ -1,7 +1,7 @@
 # What if every man disappeared — except you? (beach)
 
 Built from `prompts/what-if-men-disappeared-beach.md` with the disaster-animation skill.
-41.5 s, 9:16, 1080x1920 @ 30 fps.
+61 s, 9:16, 1080x1920 @ 30 fps.
 
 - Open `index.html` in Chrome to watch it (Space pause, ← → seek, H hide HUD).
 - The whole scene is a pure function of film time, so `?shot=12.5` renders any instant.
@@ -19,7 +19,8 @@ Story beats: cold open on the ending (everyone gathered, staring) under the titl
 your hands and board shorts → 6.0 s every man bursts into sand → the volleyball lob lands on an
 empty side → the woman beside the vanished man turns to him → unattended grill smoking → the
 driverless jet ski beaches itself → empty lifeguard tower → wide → overhead as the whole beach turns
-and walks toward you → POV, hands, then everyone staring → end card.
+and walks toward you → POV, hands, then everyone staring → hearts pop over every head → the ring closes → you
+bolt for the water and the whole beach chases you along the shoreline → end card.
 
 End-card fact: about 101 men per 100 women worldwide (UN World Population Prospects). The figure
 was taken from secondary sources quoting WPP; check it against population.un.org/wpp before posting.

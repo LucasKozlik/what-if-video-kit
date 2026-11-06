@@ -5,8 +5,8 @@
 // =====================================================================
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
-const DURATION = 41.5;
-const END_T = 35.4;
+const DURATION = 61;
+const END_T = 55;
 
 // Film time -> story time. Only the cold open differs: it shows the END of the story
 // (everyone already turned to face you) under the title, then hard-cuts to 3:12 PM.
@@ -41,12 +41,39 @@ const SHOTS = [
   { t0: 21.4, t1: 24.4, p0: V(7.5, 1.6, -1.5), p1: V(6.5, 1.6, -1.0), g0: V(-3, 1.0, 14), g1: V(-4, 1.0, 14), f0: 50, f1: 50, hand: 1 },
   // I — overhead: the whole beach turns to look at you
   { t0: 24.4, t1: 30.0, p0: V(1.5, 26, -6), p1: V(0.6, 15, -12), g0: V(0, 0, 9), g1: V(0, 0, 6), f0: 52, f1: 52, hand: 0.4, ease: 'in' },
-  // J — POV: down at your hands, then up. Everyone is staring.
-  { t0: 30.0, t1: 41.5, pov: t => {
-      const pitch = trackLin([[30, -0.25], [30.4, -0.95], [32.6, -0.95], [33.5, -0.1], [41.5, -0.08]], t);
-      const yaw = trackLin([[30, 0.0], [32.6, 0.0], [33.5, -0.05], [35, 0.08], [41.5, 0.1]], t);
+  // J — POV: down at your hands, then up. Everyone is staring. Hearts pop.
+  { t0: 30.0, t1: 38.2, pov: t => {
+      const pitch = trackLin([[30, -0.25], [30.4, -0.95], [32.6, -0.95], [33.5, -0.1], [38.2, -0.02]], t);
+      const yaw = trackLin([[30, 0.0], [32.6, 0.0], [33.5, -0.05], [35, 0.08], [36.6, -0.12], [38.2, 0.05]], t);
       return { yaw, pitch };
     }, f0: 60, f1: 60, hand: 1 },
+  // K — overhead: the ring closes in
+  { t0: 38.2, t1: 41.6, p0: V(0.6, 12.5, -9.5), p1: V(0.4, 8.5, -6.5), g0: V(0, 0, 4), g1: V(0, 0, 2.5), f0: 52, f1: 54, hand: 0.6 },
+  // L — POV: you stand, turn, and bolt for the water
+  { t0: 41.6, t1: 44.6, live: t => {
+      const st = youState(t);
+      const eyeY = lerp(0.86, 1.66, st.up) + st.y + 0.035 * Math.abs(Math.sin(st.phase)) * st.run;
+      const yawW = st.h + 0.05 * Math.sin(st.phase) * st.run;
+      const p = V(st.x + Math.sin(st.h) * 0.12, eyeY, st.z + Math.cos(st.h) * 0.12 + (1 - st.up) * 0.04);
+      const pitch = lerp(-0.02, -0.12, st.up) + 0.02 * Math.sin(st.phase * 2) * st.run;
+      return { p, g: V(p.x + Math.sin(yawW) * 5, p.y + Math.sin(pitch) * 5, p.z + Math.cos(yawW) * 5) };
+    }, f0: 62, f1: 66, hand: 1.6 },
+  // M — tracking in front of you, the whole beach charging behind
+  { t0: 44.6, t1: 48.4, live: t => {
+      const st = youState(t), q = youPos(t + 1.15);
+      const p = V(q.x + 1.6, groundY(q.x, q.z) + 1.35, q.z + 0.3);
+      return { p, g: V(st.x - Math.sin(st.h) * 4, groundY(st.x, st.z) + 1.0, st.z - Math.cos(st.h) * 4) };
+    }, f0: 50, f1: 50, hand: 1.6 },
+  // N — side-on from the shallows, sprinting along the waterline
+  { t0: 48.4, t1: 51.8, live: t => {
+      const st = youState(t);
+      return { p: V(st.x + 6, 2.0, 40), g: V(st.x - 4, 0.9, st.z) };
+    }, f0: 60, f1: 60, hand: 1.2 },
+  // O — pull up and away: one man, a beach full of pursuers (held under the end card)
+  { t0: 51.8, t1: 61, live: t => {
+      const st = youState(t), u = smooth(51.8, 58, t);
+      return { p: V(st.x - 16 - 6 * u, 4 + 22 * u, st.z - 10 - 6 * u), g: V(st.x - 6, 0, st.z) };
+    }, f0: 50, f1: 50, hand: 0.6 },
 ];
 
 function jsLook(t) { const J = jetskiState(Math.max(t, 0)); return V(J.x, 0.6, J.z); }
@@ -64,6 +91,12 @@ const CAPTIONS = [
   [24.4, 30.0, 'Everyone is looking <em>at you.</em>'],
   [30.0, 33.2, 'Same hands. <em>Still here.</em>'],
   [33.2, 35.4, 'The last man <em>on Earth.</em>'],
+  [35.4, 38.2, 'Then it <em>dawns</em> on them.'],
+  [38.2, 41.6, 'Every woman on Earth. <em>One</em> man.'],
+  [41.6, 44.6, '<em>Run.</em>'],
+  [44.6, 48.4, 'The last man alive is <em>very</em> popular.'],
+  [48.4, 51.8, 'Cardio is now <em>mandatory.</em>'],
+  [51.8, 55.0, 'Only <em>4 billion</em> to go.'],
 ];
 
 const DIR = { shot: -1, cap: -1 };
@@ -79,6 +112,8 @@ function updateCamera(T, camera) {
   if (S.pov) {
     const o = S.pov(T);
     _cp.copy(EYE); _cg.copy(povLook(o.yaw, o.pitch));
+  } else if (S.live) {
+    const o = S.live(T); _cp.copy(o.p); _cg.copy(o.g);
   } else {
     _cp.lerpVectors(S.p0, S.p1, e);
     if (S.track) { const J = jetskiState(Math.min(T, JS_BEACH_T + 2)); _cg.set(J.x, 0.6, J.z); }
@@ -96,7 +131,7 @@ function updateCamera(T, camera) {
   camera.quaternion.setFromEuler(_e);
   camera.updateProjectionMatrix();
   camera.userData.target = _cg.clone();
-  DIR.shot = i; DIR.pov = !!S.pov;
+  DIR.shot = i; DIR.pov = !!S.pov || i === SHOTS.findIndex(s => s.t0 === 41.6);
 }
 
 // ---------------- HUD ----------------
